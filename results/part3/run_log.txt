@@ -1,0 +1,18 @@
+isolated2(A={a, b}, R={no attack}): done in 1.0s
+attack2(A={a, b}, R={a->b}): done in 1.1s
+mutual2(A={a, b}, R={a->b, b->a}): done in 1.9s
+attack2_self(A={a, b}, R={a->b, b->b}): done in 2.0s
+chain3(A={a, b, c}, R={a->b, b->c}): done in 2.5s
+cycle3(A={a, b, c}, R={a->b, b->c, c->a}): done in 10.6s
+star3(A={a, b, c}, R={a->c, b->c}): done in 6.3s
+complete3(A={a, b, c}, R={a->b, a->c, b->a, b->c, c->a, c->b}): done in 10.2s
+chain4(A={a, b, c, d}, R={a->b, b->c, c->d}): done in 16.3s
+cycle4(A={a, b, c, d}, R={a->b, b->c, c->d, d->a}): done in 13.7s
+complete4(A={a, b, c, d}, R={a->b, a->c, a->d, b->a, b->c, b->d, c->a, c->b, c->d, d->a, d->b, d->c}): done in 13.1s
+random4_p0.4_s1(A={a, b, c, d}, R={a->d, b->c, d->a}): done in 13.5s
+chain5(A={a, b, c, d, e}, R={a->b, b->c, c->d, d->e}): done in 65.4s
+cycle5(A={a, b, c, d, e}, R={a->b, b->c, c->d, d->e, e->a}): done in 62.2s
+random5_p0.3_s2(A={a, b, c, d, e}, R={a->b, a->c, a->e, b->d, b->e, c->a, c->e, e->d}): done in 71.9s
+cycle6(A={a, b, c, d, e, f}, R={a->b, b->c, c->d, d->e, e->f, f->a}): done in 772.0s
+random6_p0.3_s3(A={a, b, c, d, e, f}, R={a->b, a->c, a->f, b->d, b->f, d->b, d->f, e->a, e->c, f->d}): done in 753.6s
+results written to C:\Users\Busin\icaart24-argumentation\results\part3
