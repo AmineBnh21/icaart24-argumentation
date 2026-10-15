@@ -1,4 +1,4 @@
-\documentclass[11pt,a4paper]{article}
+\documentclass[10pt,a4paper]{article}
 
 \usepackage{iftex}
 \ifXeTeX
@@ -9,7 +9,7 @@
   \usepackage{lmodern}
 \fi
 \usepackage[french]{babel}
-\usepackage[margin=2.3cm]{geometry}
+\usepackage[margin=1.7cm,top=1.5cm,bottom=1.7cm]{geometry}
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{graphicx}
 \usepackage{booktabs}
@@ -23,7 +23,15 @@
 \usepackage[colorlinks=true,linkcolor=blue!50!black,urlcolor=blue!50!black,citecolor=blue!50!black]{hyperref}
 
 \graphicspath{{../../results/part3/}}
-\setlist{itemsep=2pt,topsep=4pt}
+\setlist{itemsep=1pt,topsep=2pt,parsep=0pt,leftmargin=*}
+\setlength{\abovecaptionskip}{3pt}\setlength{\belowcaptionskip}{0pt}
+\setlength{\textfloatsep}{6pt}\setlength{\floatsep}{6pt}\setlength{\intextsep}{6pt}
+\captionsetup{font=small,labelfont=bf}
+\usepackage{titlesec}
+\titlespacing*{\section}{0pt}{8pt}{3pt}
+\titlespacing*{\subsection}{0pt}{6pt}{2pt}
+\titleformat*{\section}{\large\bfseries}
+\titleformat*{\subsection}{\normalsize\bfseries}
 
 \newtheorem{proposition}{Proposition}
 \theoremstyle{remark}
@@ -45,14 +53,13 @@
   breaklines=true, xleftmargin=4pt, xrightmargin=4pt
 }
 
-\title{\textbf{Partie 3 --- Visualising Acceptability Degree Spaces}\\[4pt]
-\large Sémantique weighted h-categorizer : convergence, enveloppe convexe et cartes de densité}
-\author{Mohamed Amine Benhamaid}
-\date{\today}
-
 \begin{document}
-\maketitle
-
+\begin{center}
+{\Large\textbf{Partie 3 --- Visualising Acceptability Degree Spaces}}\\[2pt]
+Sémantique weighted h-categorizer : convergence, enveloppe convexe et cartes de densité\\[2pt]
+\small Code, tests et figures : \url{https://github.com/AmineBnh21/icaart24-argumentation/tree/main}
+\end{center}
+\vspace{-4pt}
 \begin{abstract}
 Nous implémentons la sémantique \emph{weighted h-categorizer} avec un critère d'arrêt
 paramétré par $\varepsilon>0$, puis nous étudions l'espace des degrés d'acceptabilité
@@ -64,9 +71,6 @@ qui surestime $S$ de 7\,\% (2 arguments) à 22\,\% (6 arguments), et les cartes 
 Celles-ci sont robustes au ré-échantillonnage, avec une erreur qui décroît en $1/\sqrt N$
 (environ 4\,\% en variation totale pour $N=100\,000$).
 \end{abstract}
-
-\tableofcontents
-\newpage
 
 %======================================================================
 \section{Sémantique weighted h-categorizer}
@@ -89,29 +93,15 @@ On arrête l'itération dès que $\max_{a\in A}|f^{k+1}(a)-f^k(a)|<\varepsilon$.
 
 \subsection{Implémentation}
 
-Le code est dans \texttt{src/part3/hcategorizer.py}. La relation $R$ est stockée dans une
-matrice $M\in\{0,1\}^{n\times n}$ avec $M_{ba}=1$ si et seulement si $b$ attaque $a$. La somme
-des degrés des attaquants de tous les arguments s'écrit alors $xM$. On peut ainsi traiter
-\emph{simultanément} $N$ vecteurs de poids, rangés en lignes dans une matrice $W$ :
-
-\begin{lstlisting}
-def h_categorizer_batch(af, W, epsilon=1e-8, max_iter=100_000):
-    if epsilon <= 0:
-        raise ValueError("epsilon must be > 0")
-    M, x = af.matrix, W.copy()
-    for k in range(1, max_iter + 1):
-        x_new = W / (1.0 + x @ M)          # equation (2) for all rows at once
-        delta = np.max(np.abs(x_new - x))
-        x = x_new
-        if delta < epsilon:
-            return x
-    raise RuntimeError("no convergence")
-\end{lstlisting}
-
-La fonction \texttt{h\_categorizer(af, weights, epsilon)} traite un seul vecteur, donné sous
-forme de dictionnaire ou de liste. Un framework quelconque $(A,R)$ peut être passé en ligne
-de commande sous la forme \texttt{"a,b,c : a>b, b>c"}. Grâce à la vectorisation, le calcul
-des $100\,000$ vecteurs prend entre 0,02\,s et 0,4\,s selon le framework.
+Le code est dans \texttt{src/part3/hcategorizer.py} (voir le dépôt GitHub). La relation $R$ est
+stockée dans une matrice $M\in\{0,1\}^{n\times n}$ avec $M_{ba}=1$ si et seulement si $b$ attaque $a$ ;
+la somme des degrés des attaquants s'écrit alors $xM$. La fonction \texttt{h\_categorizer\_batch}
+traite \emph{simultanément} $N$ vecteurs de poids rangés en lignes d'une matrice $W$, en itérant
+$X\leftarrow W/(1+XM)$ jusqu'à ce que le pas maximal soit $<\varepsilon$ ($\varepsilon\le0$ est rejeté,
+et une erreur est levée en l'absence de convergence). La fonction \texttt{h\_categorizer(af, weights, epsilon)}
+traite un seul vecteur (dictionnaire ou liste). Un framework quelconque peut être passé en ligne de
+commande sous la forme \texttt{"a,b,c : a>b, b>c"}. Grâce à la vectorisation, le calcul des
+$100\,000$ vecteurs prend entre 0,02\,s et 0,4\,s selon le framework.
 
 \subsection{Tests sur de petits frameworks}
 
@@ -142,9 +132,9 @@ $\varepsilon\le 0$ et poids hors de $[0,1]$ rejetés \\
 
 \subsection{Convergence et rôle de \texorpdfstring{$\varepsilon$}{epsilon}}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
-\includegraphics[width=\linewidth]{convergence.png}
+\includegraphics[width=0.72\linewidth]{convergence.png}
 \caption{À gauche : distance au point fixe en fonction de l'itération, pour 20\,000 vecteurs
 de poids traités ensemble (échelle logarithmique). À droite : nombre d'itérations nécessaires
 en fonction de $\varepsilon$.}
@@ -283,9 +273,9 @@ de l'enveloppe. $^*$Pour une densité uniforme, la HDR50 n'est pas définie de f
 
 \subsection{Analyse de l'enveloppe convexe}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
-\includegraphics[width=\linewidth]{space_attack2.png}
+\includegraphics[width=0.85\linewidth]{space_attack2.png}
 \caption{$a\to b$. À gauche : points $x_i$, enveloppe convexe (rouge) et vraie frontière de
 $S$ (pointillés). Au centre : densité empirique. À droite : densité exacte $1+x_a$.}
 \label{fig:attack2}
@@ -320,17 +310,17 @@ $\mathrm{vol(hull)}<\mathrm{vol}(S)$ en dimensions 5 et 6.
 
 \subsection{Analyse des cartes de densité}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
-\includegraphics[width=\linewidth]{space_cycle3.png}
+\includegraphics[width=0.88\linewidth]{space_cycle3.png}
 \caption{Cycle $a\to b\to c\to a$ : enveloppe 3D et points colorés par la densité exacte
 (à gauche), puis densité des trois projections 2D avec l'enveloppe projetée (en cyan).}
 \label{fig:cycle3}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
-\includegraphics[width=0.78\linewidth]{space_complete4.png}
+\includegraphics[width=0.5\linewidth]{space_complete4.png}
 \caption{Graphe complet à 4 arguments. Sous la diagonale : densités projetées et enveloppe
 projetée. Sur la diagonale : distributions marginales. Au-dessus : corrélations.}
 \label{fig:complete4}
@@ -365,17 +355,17 @@ concentre dans une partie de plus en plus petite d'un espace lui-même de plus e
 
 \subsection{Résilience au ré-échantillonnage}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
-\includegraphics[width=\linewidth]{resampling_mutual2.png}
+\includegraphics[width=0.72\linewidth]{resampling_mutual2.png}
 \caption{$a\leftrightarrow b$ : deux échantillons indépendants de $N=100\,000$ points et leur
 différence, qui ne montre que du bruit sans structure spatiale.}
 \label{fig:resamp}
 \end{figure}
 
-\begin{figure}[H]
+\begin{figure}[!htb]
 \centering
-\includegraphics[width=0.62\linewidth]{tv_vs_n.png}
+\includegraphics[width=0.42\linewidth]{tv_vs_n.png}
 \caption{Distance TV entre la heat-map et une référence, en fonction de $N$. La référence est
 la densité exacte intégrée par case pour les frameworks à 2 arguments, et un échantillon de
 2 millions de points sinon. La pente vaut $-1/2$.}
@@ -425,65 +415,12 @@ information est robuste au ré-échantillonnage, avec une erreur en $1/\sqrt N$ 
 4\,\% pour $N=100\,000$.
 \end{itemize}
 
-\paragraph{Reproductibilité.}
-\begin{lstlisting}[language=bash]
-python -m pytest tests -q                       # 19 tests
-python -m src.part3.run_experiments             # all experiments (N = 100 000)
-python -m src.part3.run_experiments --af "a,b,c : a>b, b>c, c>a"
-\end{lstlisting}
+\paragraph{Reproductibilité.} \texttt{python -m pytest tests -q} (19 tests) ;
+\texttt{python -m src.part3.run\_experiments} (toutes les expériences) ; option
+\texttt{--af "a,b,c : a>b, b>c, c>a"} pour un framework quelconque. Les figures des 17
+frameworks sont dans \texttt{results/part3/} sur le dépôt.
 
 \paragraph{Référence.} L.~Amgoud, J.~Ben-Naim, D.~Doder, S.~Vesic. \emph{Acceptability
 Semantics for Weighted Argumentation Frameworks}. IJCAI 2017, p.~56--62.
-
-%======================================================================
-\appendix
-\section{Figures pour l'ensemble des frameworks}
-%======================================================================
-
-\subsection{Frameworks à 2 arguments}
-\begin{figure}[H]\centering
-\includegraphics[width=\linewidth]{space_isolated2.png}
-\includegraphics[width=\linewidth]{space_mutual2.png}
-\includegraphics[width=\linewidth]{space_attack2_self.png}
-\caption{Sans attaque, attaque mutuelle, et $a\to b$ avec auto-attaque de $b$.}
-\end{figure}
-
-\subsection{Frameworks à 3 arguments}
-\begin{figure}[H]\centering
-\includegraphics[width=\linewidth]{space_chain3.png}
-\includegraphics[width=\linewidth]{space_star3.png}
-\includegraphics[width=\linewidth]{space_complete3.png}
-\caption{Chaîne, étoile et graphe complet à 3 arguments.}
-\end{figure}
-
-\subsection{Frameworks à 4 arguments}
-\begin{figure}[H]\centering
-\begin{subfigure}{0.49\linewidth}\includegraphics[width=\linewidth]{space_chain4.png}\caption{chaîne}\end{subfigure}
-\begin{subfigure}{0.49\linewidth}\includegraphics[width=\linewidth]{space_cycle4.png}\caption{cycle}\end{subfigure}
-\begin{subfigure}{0.49\linewidth}\includegraphics[width=\linewidth]{space_random4_p0.4_s1.png}\caption{aléatoire ($p=0{,}4$)}\end{subfigure}
-\caption{Frameworks à 4 arguments (le graphe complet est en figure~\ref{fig:complete4}).}
-\end{figure}
-
-\subsection{Frameworks à 5 arguments}
-\begin{figure}[H]\centering
-\begin{subfigure}{0.49\linewidth}\includegraphics[width=\linewidth]{space_chain5.png}\caption{chaîne}\end{subfigure}
-\begin{subfigure}{0.49\linewidth}\includegraphics[width=\linewidth]{space_cycle5.png}\caption{cycle}\end{subfigure}
-\begin{subfigure}{0.6\linewidth}\includegraphics[width=\linewidth]{space_random5_p0.3_s2.png}\caption{aléatoire ($p=0{,}3$)}\end{subfigure}
-\caption{Frameworks à 5 arguments.}
-\end{figure}
-
-\subsection{Frameworks à 6 arguments}
-\begin{figure}[H]\centering
-\begin{subfigure}{0.49\linewidth}\includegraphics[width=\linewidth]{space_cycle6.png}\caption{cycle}\end{subfigure}
-\begin{subfigure}{0.49\linewidth}\includegraphics[width=\linewidth]{space_random6_p0.3_s3.png}\caption{aléatoire ($p=0{,}3$)}\end{subfigure}
-\caption{Frameworks à 6 arguments.}
-\end{figure}
-
-\subsection{Ré-échantillonnage}
-\begin{figure}[H]\centering
-\includegraphics[width=\linewidth]{resampling_attack2.png}
-\includegraphics[width=\linewidth]{resampling_cycle3.png}
-\caption{Deux ré-échantillonnages indépendants et leur différence, pour $a\to b$ et le cycle à 3.}
-\end{figure}
 
 \end{document}
