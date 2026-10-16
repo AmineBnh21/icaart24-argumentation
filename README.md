@@ -4,8 +4,9 @@
 
 *Auteur : Mohamed Amine Benhamaid*
 
-📄 [Version courte du rapport (PDF, 5 pages)](docs/partie3/rapport_partie3.pdf) · 📓 [Notebook](notebooks/partie3.ipynb) · Code : [`src/part3/`](src/part3) · Tests : [`tests/test_part3_hcategorizer.py`](tests/test_part3_hcategorizer.py) · Figures : [`results/part3/`](results/part3)
-
+ [Version courte du rapport (PDF, 5 pages)](docs/partie3/rapport_partie3.pdf)
+·  [Notebook](notebooks/partie3.ipynb)
+· Tests : [`tests/test_part3_hcategorizer.py`](tests/test_part3_hcategorizer.py) 
 > **Résumé.** Nous implémentons la sémantique *weighted h-categorizer* avec un critère d'arrêt
 > paramétré par $\varepsilon>0$, puis nous étudions l'espace des degrés d'acceptabilité
 > $S=\mathrm{HCat}([0,1]^{|A|})$ en échantillonnant 100 000 vecteurs de poids uniformes pour
